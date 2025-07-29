@@ -8,8 +8,12 @@ model = XGBClassifier()
 model.load_model("Xgb_model.json")
 
 # Load expected feature columns from training
-with open("Xgb_features.txt") as f:
-    expected_cols = [line.strip() for line in f]
+expected_cols = ['age', 'trestbps', 'chol', 'thalch', 'oldpeak', 'ca', 'fbs_True',
+       'fbs_Unknown', 'restecg_lv hypertrophy', 'restecg_normal',
+       'restecg_st-t abnormality', 'cp_atypical angina', 'cp_non-anginal',
+       'cp_typical angina', 'thal_fixed defect', 'thal_normal',
+       'thal_reversable defect', 'slope_downsloping', 'slope_flat',
+       'slope_upsloping', 'sex_Male', 'exang_True', 'exang_Unknown']
 
 # Streamlit UI setup
 st.set_page_config(page_title='Heart Disease Predictor', layout='centered')
