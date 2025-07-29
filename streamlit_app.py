@@ -80,4 +80,4 @@ if st.button("Predict"):
     result = "💔 Heart Disease Detected" if prediction == 1 else "💖 No Heart Disease Detected"
     
     st.success(f"🩺 Result: *{result}*")
-    st.info(f"Risk score: {proba:.2f} (1 = highest risk)")
+    st.info(f"Risk score: {proba:.2f} (0 = no heart disease, 1,2,3,4 = stages of heart disease)")
