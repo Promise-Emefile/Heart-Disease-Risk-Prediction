@@ -75,7 +75,7 @@ input_encoded = input_encoded[expected_cols]  # match column order
 
 # Predict
 prediction = model.predict(input_encoded)[0]
-    probas = model.predict_proba(input_encoded)[0]
+probas = model.predict_proba(input_encoded)[0]
 
     if prediction == 0:
         result = "💖 No Heart Disease Detected (Class 0)"
