@@ -8,7 +8,7 @@ model = XGBClassifier()
 model.load_model("Xgb_model.json")
 
 # Load expected feature columns from training
-with open("xgb_features.txt") as f:
+with open("Xgb_features.txt") as f:
     expected_cols = [line.strip() for line in f]
 
 # Streamlit UI setup
