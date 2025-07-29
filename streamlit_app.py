@@ -77,14 +77,14 @@ input_encoded = input_encoded[expected_cols]  # match column order
 prediction = model.predict(input_encoded)[0]
 probas = model.predict_proba(input_encoded)[0]
 
-    if prediction == 0:
-        result = "💖 No Heart Disease Detected (Class 0)"
-    else:
-        result = f"💔 Heart Disease Detected — Stage {prediction} (Class {prediction})"
+if prediction == 0:
+       result = "💖 No Heart Disease Detected (Class 0)"
+else:
+       result = f"💔 Heart Disease Detected — Stage {prediction} (Class {prediction})"
 
-    st.success(f"🩺 Result: *{result}*")
+st.success(f"🩺 Result: *{result}*")
 
-    # Show confidence scores for each class
-    st.markdown("### 🔬 Class Probabilities:")
-    for i, p in enumerate(probas):
-        st.write(f"Class {i}: {p:.2%}")
+ # Show confidence scores for each class
+st.markdown("### 🔬 Class Probabilities:")
+for i, p in enumerate(probas):
+       st.write(f"Class {i}: {p:.2%}")
