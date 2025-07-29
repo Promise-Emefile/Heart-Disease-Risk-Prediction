@@ -61,7 +61,7 @@ input_data = pd.DataFrame({
 })
 
 # Convert to DMatrix
-dmatrix = xgb.DMatrix(input_data)
+dmatrix = xgb.DMatrix(input_data, feature_names=input_data.columns.tolist())
 
 # Predict
 if st.button('Predict'):
