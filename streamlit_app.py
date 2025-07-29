@@ -74,10 +74,17 @@ for col in expected_cols:
 input_encoded = input_encoded[expected_cols]  # match column order
 
 # Predict
-if st.button("Predict"):
-    prediction = model.predict(input_encoded)[0]
-    proba = model.predict_proba(input_encoded)[0][1]
-    result = "💔 Heart Disease Detected" if prediction == 1 else "💖 No Heart Disease Detected"
-    
+prediction = model.predict(input_encoded)[0]
+    probas = model.predict_proba(input_encoded)[0]
+
+    if prediction == 0:
+        result = "💖 No Heart Disease Detected (Class 0)"
+    else:
+        result = f"💔 Heart Disease Detected — Stage {prediction} (Class {prediction})"
+
     st.success(f"🩺 Result: *{result}*")
-    st.info(f"Risk score: {proba:.2f} (0 = no heart disease, 1,2,3,4 = stages of heart disease)")
+
+    # Show confidence scores for each class
+    st.markdown("### 🔬 Class Probabilities:")
+    for i, p in enumerate(probas):
+        st.write(f"Class {i}: {p:.2%}")
