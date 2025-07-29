@@ -1,12 +1,17 @@
-import streamlit as st
+mport streamlit as st
 import pandas as pd
-import xgboost as xgb
 import numpy as np
+from xgboost import XGBClassifier
 
-# Load JSON model
-booster = xgb.Booster()
-booster.load_model("Xgb_model.json")
+# Load trained model
+model = XGBClassifier()
+model.load_model("Xgb_model.json")
 
+# Load expected feature columns from training
+with open("xgb_features.txt") as f:
+    expected_cols = [line.strip() for line in f]
+
+# Streamlit UI setup
 st.set_page_config(page_title='Heart Disease Predictor', layout='centered')
 st.title('💓 Heart Disease Prediction App')
 st.markdown("""
@@ -14,7 +19,7 @@ Welcome! This app uses an XGBoost model to estimate your risk of heart disease.
 
 ### 👉 How to Use:
 1. Fill in your medical info.
-2. Click **Predict**.
+2. Click *Predict*.
 3. View your result instantly.
 
 > This tool is for educational purposes only.
@@ -30,41 +35,45 @@ fbs = st.selectbox('Fasting Blood Sugar > 120 mg/dl', ['True', 'False'])
 restecg = st.selectbox('Resting ECG Result', ['normal', 'lv hypertrophy', 'ST-T abnormality'])
 thalch = st.number_input('Maximum Heart Rate Achieved', min_value=60, max_value=220)
 exang = st.selectbox('Exercise Induced Angina', ['True', 'False'])
-oldpeak = st.number_input('Oldpeak (ST depression)', min_value=0.0, max_value=6.0)
+oldpeak = st.number_input('Oldpeak (ST depression)', min_value=0.0, max_value=6.0, step=0.1)
 slope = st.selectbox('Slope of ST Segment', ['upsloping', 'flat', 'downsloping'])
 ca = st.slider('Number of Major Vessels by Fluoroscopy', min_value=0, max_value=4)
 thal = st.selectbox('Thalassemia', ['normal', 'fixed defect', 'reversable defect'])
 
-# Encode input
-input_data = pd.DataFrame({
-    'age': [age],
-    'sex': [1 if sex == 'Male' else 0],
-    'cp': [[
-        'typical angina', 'atypical angina', 'non-anginal', 'asymptomatic'
-    ].index(cp)],
-    'trestbps': [trestbps],
-    'chol': [chol],
-    'fbs': [1 if fbs == 'True' else 0],
-    'restecg': [[
-        'normal', 'lv hypertrophy', 'ST-T abnormality'
-    ].index(restecg)],
-    'thalch': [thalch],
-    'exang': [1 if exang == 'True' else 0],
-    'oldpeak': [oldpeak],
-    'slope': [[
-        'upsloping', 'flat', 'downsloping'
-    ].index(slope)],
-    'ca': [ca],
-    'thal': [[
-        'normal', 'fixed defect', 'reversable defect'
-    ].index(thal)],
-})
+# Collect user input
+input_dict = {
+    'age': age,
+    'sex': sex,
+    'cp': cp,
+    'trestbps': trestbps,
+    'chol': chol,
+    'fbs': fbs,
+    'restecg': restecg,
+    'thalch': thalch,
+    'exang': exang,
+    'oldpeak': oldpeak,
+    'slope': slope,
+    'ca': ca,
+    'thal': thal
+}
 
-# Convert to DMatrix
-dmatrix = xgb.DMatrix(input_data, feature_names=input_data.columns.tolist())
+input_df = pd.DataFrame([input_dict])
+
+# Encode categorical variables using the same method as training
+input_encoded = pd.get_dummies(input_df)
+
+# Add any missing columns and reorder
+for col in expected_cols:
+    if col not in input_encoded.columns:
+        input_encoded[col] = 0
+
+input_encoded = input_encoded[expected_cols]  # match column order
 
 # Predict
-if st.button('Predict'):
-    prediction = booster.predict(dmatrix)[0]
-    result = "Heart Disease Detected" if prediction > 0.5 else "No Heart Disease"
-    st.success(f'🩺 Result: **{result}**')
+if st.button("Predict"):
+    prediction = model.predict(input_encoded)[0]
+    proba = model.predict_proba(input_encoded)[0][1]
+    result = "💔 Heart Disease Detected" if prediction == 1 else "💖 No Heart Disease Detected"
+    
+    st.success(f"🩺 Result: *{result}*")
+    st.info(f"Risk score: {proba:.2f} (1 = highest risk)")
