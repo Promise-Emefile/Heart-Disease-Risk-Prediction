@@ -135,4 +135,4 @@ else:
 
         except Exception as e:
             st.error("❌ Prediction failed.")
-            st.code(str(e))
+            st.code(str(e))
