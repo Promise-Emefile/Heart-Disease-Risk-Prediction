@@ -117,6 +117,7 @@ else:
             if col not in input_encoded:
                 input_encoded[col] = 0
         input_encoded = input_encoded[expected_cols]
+        imput_encoded = input_encoded.astype(np.float32)
 
         pred = model.predict(input_encoded)[0]
         proba = model.predict_proba(input_encoded)[0]
