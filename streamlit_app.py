@@ -134,11 +134,11 @@ st.write("❌ Missing columns:", missing)
 st.write("Extra columns:", extra)
 
 
-        pred = model.predict(input_encoded)[0]
-        proba = model.predict_proba(input_encoded)[0]
+pred = model.predict(input_encoded)[0]
+proba = model.predict_proba(input_encoded)[0]
 
-        st.success(f"🩺 Prediction: *{stage_desc[pred]} (Class {pred})*")
+st.success(f"🩺 Prediction: *{stage_desc[pred]} (Class {pred})*")
 
-        st.markdown("### 🔬 Class Probabilities:")
-        for i, p in enumerate(proba):
-            st.write(f"Class {i} ({stage_desc[i]}): {p:.2%}")
+st.markdown("### 🔬 Class Probabilities:")
+for i, p in enumerate(proba):
+    st.write(f"Class {i} ({stage_desc[i]}): {p:.2%}")
