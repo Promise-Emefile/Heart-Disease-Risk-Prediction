@@ -67,4 +67,4 @@ dmatrix = xgb.DMatrix(input_data, feature_names=input_data.columns.tolist())
 if st.button('Predict'):
     prediction = booster.predict(dmatrix)[0]
     result = "Heart Disease Detected" if prediction > 0.5 else "No Heart Disease"
-    st.success(f'🩺 Result: *{result}*'
+    st.success(f'🩺 Result: *{result}*')
