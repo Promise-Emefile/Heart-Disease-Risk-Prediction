@@ -5,7 +5,7 @@ from xgboost import XGBClassifier
 
 # Load model
 model = XGBClassifier()
-model.load_model("xgb_model.json")
+model.load_model("Xgb_model.json")
 
 # Define expected columns (same as used in training after get_dummies)
 expected_cols = [
