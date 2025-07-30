@@ -131,7 +131,8 @@ missing = [col for col in model_cols if col not in input_cols]
 extra = [col for col in input_cols if col not in model_cols]
 
 st.write("❌ Missing columns:", missing)
-st.write("⚠ Extra columns:", extra)
+st.write("Extra columns:" extra)
+
 
         pred = model.predict(input_encoded)[0]
         proba = model.predict_proba(input_encoded)[0]
