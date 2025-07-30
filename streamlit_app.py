@@ -119,6 +119,20 @@ else:
         input_encoded = input_encoded[expected_cols]
         imput_encoded = input_encoded.astype(np.float32)
 
+        # Inspect what model expects
+st.write("Model expects:", model.get_booster().feature_names)
+st.write("Your input:", input_encoded.columns.tolist())
+
+# Compare feature sets
+model_cols = model.get_booster().feature_names
+input_cols = input_encoded.columns.tolist()
+
+missing = [col for col in model_cols if col not in input_cols]
+extra = [col for col in input_cols if col not in model_cols]
+
+st.write("❌ Missing columns:", missing)
+st.write("⚠ Extra columns:", extra)
+
         pred = model.predict(input_encoded)[0]
         proba = model.predict_proba(input_encoded)[0]
 
