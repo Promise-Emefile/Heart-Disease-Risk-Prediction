@@ -107,7 +107,7 @@ else:
 
         input_df = pd.DataFrame([input_dict])
         input_encoded = pd.get_dummies(input_df)
-        input_encoded.columns = input_encoded
+        input_encoded.columns = input_encoded
 
 st.success(f"🩺 Prediction: *{stage_desc[pred]} (Class {pred})*")
 
