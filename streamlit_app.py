@@ -7,17 +7,8 @@ from xgboost import XGBClassifier
 model = XGBClassifier()
 model.load_model("Xgb_model.json")
 
-# Define expected columns (same as used in training after get_dummies)
-expected_cols = [
-    'age', 'trestbps', 'chol', 'thalch', 'oldpeak', 'ca',
-    'sex_Female', 'sex_Male',
-    'cp_asymptomatic', 'cp_atypical angina', 'cp_non-anginal', 'cp_typical angina',
-    'fbs_False', 'fbs_True',
-    'restecg_ST-T abnormality', 'restecg_lv hypertrophy', 'restecg_normal',
-    'exang_False', 'exang_True',
-    'slope_downsloping', 'slope_flat', 'slope_upsloping',
-    'thal_fixed defect', 'thal_normal', 'thal_reversable defect'
-]
+# Use actual feature names from model
+expected_cols = model.get_booster().feature_names
 
 # Stage labels
 stage_desc = {
@@ -51,13 +42,18 @@ if uploaded_file:
         df = pd.read_excel(uploaded_file)
 
     df_encoded = pd.get_dummies(df)
+    df_encoded.columns = df_encoded.columns.str.strip()
 
-    # Ensure all expected columns are present
+    # Add missing columns
     for col in expected_cols:
-        if col not in df_encoded:
+        if col not in df_encoded.columns:
             df_encoded[col] = 0
-    df_encoded = df_encoded[expected_cols]
 
+    # Drop extra columns and reorder
+    df_encoded = df_encoded[expected_cols]
+    df_encoded = df_encoded.astype(np.float32)
+
+    # Predict
     preds = model.predict(df_encoded)
     probas = model.predict_proba(df_encoded)
 
@@ -81,10 +77,10 @@ else:
         cp = st.selectbox('Chest Pain Type', ['typical angina', 'atypical angina', 'non-anginal', 'asymptomatic'])
         trestbps = st.number_input('Resting Blood Pressure (mm Hg)', min_value=80, max_value=200)
         chol = st.number_input('Serum Cholesterol (mg/dl)', min_value=100, max_value=600)
-        fbs = st.selectbox('Fasting Blood Sugar > 120 mg/dl', ['True', 'False'])
+        fbs = st.selectbox('Fasting Blood Sugar > 120 mg/dl', ['True', 'False', 'Unknown'])
         restecg = st.selectbox('Resting ECG Result', ['normal', 'lv hypertrophy', 'ST-T abnormality'])
         thalch = st.number_input('Max Heart Rate Achieved', min_value=60, max_value=220)
-        exang = st.selectbox('Exercise Induced Angina', ['True', 'False'])
+        exang = st.selectbox('Exercise Induced Angina', ['True', 'False', 'Unknown'])
         oldpeak = st.number_input('Oldpeak (ST depression)', min_value=0.0, max_value=6.0, step=0.1)
         slope = st.selectbox('Slope of ST Segment', ['upsloping', 'flat', 'downsloping'])
         ca = st.slider('Number of Major Vessels (0–4)', min_value=0, max_value=4)
@@ -111,31 +107,7 @@ else:
 
         input_df = pd.DataFrame([input_dict])
         input_encoded = pd.get_dummies(input_df)
-
-        # Align columns
-        for col in expected_cols:
-            if col not in input_encoded:
-                input_encoded[col] = 0
-        input_encoded = input_encoded[expected_cols]
-        imput_encoded = input_encoded.astype(np.float32)
-
-        # Inspect what model expects
-st.write("Model expects:", model.get_booster().feature_names)
-st.write("Your input:", input_encoded.columns.tolist())
-
-# Compare feature sets
-model_cols = model.get_booster().feature_names
-input_cols = input_encoded.columns.tolist()
-
-missing = [col for col in model_cols if col not in input_cols]
-extra = [col for col in input_cols if col not in model_cols]
-
-st.write("❌ Missing columns:", missing)
-st.write("Extra columns:", extra)
-
-
-pred = model.predict(input_encoded)[0]
-proba = model.predict_proba(input_encoded)[0]
+        input_encoded.columns = input_encoded
 
 st.success(f"🩺 Prediction: *{stage_desc[pred]} (Class {pred})*")
 
